@@ -1,3 +1,9 @@
+use qmetaobject::QmlEngine;
+
 fn main() {
-    println!("Hello, world!");
+    let mut engine = QmlEngine::new();
+
+    engine.load_file("../../qml/Main.qml".into());
+
+    engine.exec();
 }
