@@ -67,9 +67,21 @@ jobs:
 
       - name: Build Debian package
         run: |
+          cargo metadata --locked --format-version 1 --no-deps >/dev/null
           dpkg-buildpackage -us -uc -b
+
+          shopt -s nullglob
+          packages=(../"${APP_NAME}"_*.deb)
+          test "${#packages[@]}" -eq 1
+
           mkdir -p dist
-          cp ../${APP_NAME}_*.deb dist/
+          cp "${packages[0]}" dist/
+
+          package_root="$(mktemp -d)"
+          dpkg-deb --extract "${packages[0]}" "${package_root}"
+          install -Dm755 \
+            "${package_root}/usr/lib/${APP_NAME}/${APP_NAME}" \
+            "dist/${APP_NAME}"
 
       - name: Create draft GitHub release
         uses: softprops/action-gh-release@v2
@@ -78,5 +90,5 @@ jobs:
           draft: true
           generate_release_notes: true
           files: |
-            target/release/${{ env.APP_NAME }}
+            dist/${{ env.APP_NAME }}
             dist/*.deb
