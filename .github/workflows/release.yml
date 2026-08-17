@@ -31,6 +31,7 @@ jobs:
       - name: Checkout requested tag
         if: github.event_name == 'workflow_dispatch'
         run: |
+          git fetch --force origin "refs/tags/${RELEASE_TAG}:refs/tags/${RELEASE_TAG}"
           git rev-parse --verify "refs/tags/${RELEASE_TAG}"
           git checkout --detach "refs/tags/${RELEASE_TAG}"
 
