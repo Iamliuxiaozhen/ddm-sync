@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+
+export CARGO_HOME := $(CURDIR)/debian/cargo-home
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	cargo build --release --locked
+
+override_dh_auto_test:
+	cargo test --locked
+
+override_dh_auto_clean:
+	cargo clean
+	rm -rf debian/cargo-home
+
+override_dh_auto_install:
+	install -Dm755 target/release/ddm-sync debian/ddm-sync/usr/lib/ddm-sync/ddm-sync
+	install -Dm644 qml/Main.qml debian/ddm-sync/usr/lib/ddm-sync/qml/Main.qml
+	install -Dm755 debian/ddm-sync.wrapper debian/ddm-sync/usr/bin/ddm-sync
+	install -Dm644 debian/ddm-sync.desktop debian/ddm-sync/usr/share/applications/ddm-sync.desktop

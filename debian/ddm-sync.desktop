@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=DDM Sync
+Comment=Synchronize display-manager monitor layouts
+Exec=ddm-sync
+Terminal=false
+Categories=Settings;System;
+Keywords=display;monitor;login;gdm;sddm;
