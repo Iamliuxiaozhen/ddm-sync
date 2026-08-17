@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 ApplicationWindow {
+    id: window
     visible: true
     width: 800
     height: 500
@@ -9,6 +10,8 @@ ApplicationWindow {
     minimumHeight: 360
     title: "DDM-sync"
     color: "#f4f6f8"
+
+    property string statusMode: "ready"
 
     Rectangle {
         anchors.fill: parent
@@ -18,7 +21,7 @@ ApplicationWindow {
             id: panel
             anchors.centerIn: parent
             width: Math.min(parent.width - 48, 560)
-            height: content.implicitHeight + 64
+            height: Math.min(parent.height - 48, content.implicitHeight + 64)
             radius: 10
             color: "#ffffff"
             border.color: "#e1e6eb"
@@ -30,6 +33,7 @@ ApplicationWindow {
                     left: parent.left
                     right: parent.right
                     top: parent.top
+                    bottom: parent.bottom
                     margins: 32
                 }
                 spacing: 0
@@ -77,7 +81,7 @@ ApplicationWindow {
                         width: 9
                         height: 9
                         radius: 5
-                        color: "#22a06b"
+                        color: window.statusMode === "error" ? "#c2410c" : (window.statusMode === "success" ? "#15803d" : "#64748b")
                         anchors {
                             left: parent.left
                             verticalCenter: syncButton.verticalCenter
@@ -87,11 +91,15 @@ ApplicationWindow {
                     Label {
                         id: statusLabel
                         text: "Ready to sync"
-                        color: "#334155"
+                        color: window.statusMode === "error" ? "#9a3412" : "#334155"
                         font.pixelSize: 14
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
                         anchors {
                             left: statusDot.right
                             leftMargin: 12
+                            right: syncButton.left
+                            rightMargin: 20
                             verticalCenter: syncButton.verticalCenter
                         }
                     }
@@ -122,10 +130,30 @@ ApplicationWindow {
                         }
 
                         onClicked: {
-                            statusLabel.text = "Sync request sent"
-                            backend.sync()
+                            syncButton.enabled = false
+                            statusLabel.text = "Waiting for authorization"
+                            window.statusMode = "ready"
+
+                            var rawResult = backend.sync()
+                            var failed = rawResult.indexOf("ERROR|") === 0
+                            var result = rawResult.replace(/^OK\|/, "").replace(/^ERROR\|/, "")
+
+                            statusLabel.text = result
+                            window.statusMode = failed ? "error" : "success"
+                            syncButton.enabled = true
                         }
                     }
+                }
+
+                Label {
+                    id: detailLabel
+                    text: statusLabel.text === "Ready to sync" ? "" : statusLabel.text
+                    visible: text.length > 0
+                    width: parent.width
+                    color: window.statusMode === "error" ? "#9a3412" : "#475569"
+                    font.pixelSize: 13
+                    wrapMode: Text.WordWrap
+                    topPadding: 2
                 }
             }
         }
