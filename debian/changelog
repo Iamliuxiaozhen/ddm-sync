@@ -1,5 +1,9 @@
-ddm-sync (0.1.1-1) unstable; urgency=medium
+ddm-sync (0.1.2-1) unstable; urgency=medium
 
   * Initial release.
+  * Add Debian packaging support.
+  * Build and install the ddm-sync binary and QML assets.
+  * Add desktop entry and PolicyKit integration.
 
- -- Oliver Lin <oliver@liuxiaozhen.dev>  Mon, 17 Aug 2026 19:30:00 +0800
+ -- Oliver Lin <oliver@liuxiaozhen.dev>  Mon, 17 Aug 2026 20:00:00 +0800
+ 
