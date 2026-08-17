@@ -12,6 +12,8 @@ ApplicationWindow {
     color: "#f4f6f8"
 
     property string statusMode: "ready"
+    property string dialogTitle: ""
+    property string dialogMessage: ""
 
     Rectangle {
         anchors.fill: parent
@@ -138,9 +140,13 @@ ApplicationWindow {
                             var failed = rawResult.indexOf("ERROR|") === 0
                             var result = rawResult.replace(/^OK\|/, "").replace(/^ERROR\|/, "")
 
-                            statusLabel.text = result
+                            statusLabel.text = failed ? "Sync failed" : "Sync completed"
                             window.statusMode = failed ? "error" : "success"
                             syncButton.enabled = true
+
+                            window.dialogTitle = failed ? "Sync failed" : "Sync completed"
+                            window.dialogMessage = result
+                            resultDialog.open()
                         }
                     }
                 }
@@ -156,6 +162,23 @@ ApplicationWindow {
                     topPadding: 2
                 }
             }
+        }
+    }
+
+    Dialog {
+        id: resultDialog
+        modal: true
+        title: window.dialogTitle
+        standardButtons: Dialog.Ok
+        anchors.centerIn: parent
+        width: Math.min(parent.width - 48, 460)
+
+        contentItem: Label {
+            text: window.dialogMessage
+            color: window.statusMode === "error" ? "#9a3412" : "#334155"
+            font.pixelSize: 14
+            wrapMode: Text.WordWrap
+            width: parent.width
         }
     }
 }
