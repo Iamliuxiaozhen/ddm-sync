@@ -6,7 +6,7 @@ Build-Depends:
  debhelper-compat (= 13),
  cargo,
  rustc,
- pkg-config,
+ pkgconf,
  qtbase5-dev,
  qtdeclarative5-dev
 Standards-Version: 4.7.0

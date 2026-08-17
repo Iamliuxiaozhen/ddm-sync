@@ -17,3 +17,4 @@ override_dh_auto_install:
 	install -Dm644 qml/Main.qml debian/ddm-sync/usr/lib/ddm-sync/qml/Main.qml
 	install -Dm755 debian/ddm-sync.wrapper debian/ddm-sync/usr/bin/ddm-sync
 	install -Dm644 debian/ddm-sync.desktop debian/ddm-sync/usr/share/applications/ddm-sync.desktop
+	install -Dm644 debian/ddm-sync.1 debian/ddm-sync/usr/share/man/man1/ddm-sync.1
