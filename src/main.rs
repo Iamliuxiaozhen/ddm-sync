@@ -144,8 +144,21 @@ fn main() {
 
     engine.set_object_property("backend".into(), backend.pinned());
 
-    let qml_path = concat!(env!("CARGO_MANIFEST_DIR"), "/qml/Main.qml");
-    engine.load_file(qml_path.into());
+    engine.load_file(qml_path().to_string_lossy().into_owned().into());
 
     engine.exec();
+}
+
+fn qml_path() -> PathBuf {
+    let bundled_path = env::current_exe()
+        .ok()
+        .and_then(|path| path.parent().map(|parent| parent.join("qml/Main.qml")));
+
+    if let Some(path) = bundled_path
+        && path.is_file()
+    {
+        return path;
+    }
+
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("qml/Main.qml")
 }
