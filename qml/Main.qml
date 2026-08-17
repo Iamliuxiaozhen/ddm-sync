@@ -123,7 +123,7 @@ ApplicationWindow {
 
                         onClicked: {
                             statusLabel.text = "Sync request sent"
-                            console.log("Sync requested")
+                            backend.sync()
                         }
                     }
                 }
