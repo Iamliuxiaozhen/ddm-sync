@@ -1,0 +1,28 @@
+Source: ddm-sync
+Section: utils
+Priority: optional
+Maintainer: Oliver Lin <oliver@liuxiaozhen.dev>
+Build-Depends:
+ debhelper-compat (= 13),
+ cargo,
+ rustc,
+ pkg-config,
+ qtbase5-dev,
+ qtdeclarative5-dev
+Standards-Version: 4.7.0
+Homepage: https://github.com/Iamliuxiaozhen/ddm-sync
+Rules-Requires-Root: no
+
+Package: ddm-sync
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+ pkexec | policykit-1,
+ qml-module-qtquick2,
+ qml-module-qtquick-controls2
+Description: synchronize display-manager monitor layouts
+ ddm-sync copies the current user's desktop display layout to installed
+ display-manager accounts such as SDDM, GDM3, and GDM.
+ .
+ It uses PolicyKit only for the privileged copy operation under /var/lib.

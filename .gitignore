@@ -1,0 +1,6 @@
+debian/ddm-sync.substvars
+debian/debhelper-build-stamp
+debian/.debhelper/
+debian/cargo-home/
+debian/files
+debian/ddm-sync/
