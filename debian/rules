@@ -1,7 +1,5 @@
 #!/usr/bin/make -f
 
-export CARGO_HOME := $(CURDIR)/debian/cargo-home
-
 %:
 	dh $@
 
@@ -13,7 +11,6 @@ override_dh_auto_test:
 
 override_dh_auto_clean:
 	cargo clean
-	rm -rf debian/cargo-home
 
 override_dh_auto_install:
 	install -Dm755 target/release/ddm-sync debian/ddm-sync/usr/lib/ddm-sync/ddm-sync
