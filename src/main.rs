@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Oliver Lin
+// SPDX-License-Identifier: MIT
+
 use qmetaobject::prelude::*;
 use std::env;
 use std::path::{Path, PathBuf};
@@ -34,6 +37,8 @@ fn sync_display_configs() -> Result<String, String> {
     let home = env::var_os("HOME").ok_or_else(|| "HOME is not set.".to_owned())?;
     let home = PathBuf::from(home);
 
+    // Only offer targets that exist locally, so unsupported display managers
+    // never trigger a privilege prompt.
     let tasks = available_tasks(&home);
     if tasks.is_empty() {
         return Err("No display configuration was found to sync.".to_owned());
@@ -42,6 +47,8 @@ fn sync_display_configs() -> Result<String, String> {
     let mut synced = Vec::new();
     let mut failures = Vec::new();
 
+    // Run every applicable task and report partial success instead of stopping
+    // after the first display manager fails.
     for task in tasks {
         match run_sync_task(&task) {
             Ok(()) => synced.push(task.label),
@@ -67,6 +74,7 @@ fn available_tasks(home: &Path) -> Vec<SyncTask> {
     let kscreen = home.join(".local/share/kscreen");
     let monitors = home.join(".config/monitors.xml");
 
+    // SDDM reads KScreen's per-user display layout from its own home directory.
     if kscreen.is_dir() && Path::new("/var/lib/sddm").is_dir() {
         tasks.push(SyncTask {
             label: "SDDM",
@@ -76,6 +84,7 @@ fn available_tasks(home: &Path) -> Vec<SyncTask> {
         });
     }
 
+    // Distributions use either gdm3 or gdm for the display manager account.
     if monitors.is_file() && Path::new("/var/lib/gdm3").is_dir() {
         tasks.push(SyncTask {
             label: "GDM3",
@@ -102,11 +111,15 @@ fn run_sync_task(task: &SyncTask) -> Result<(), String> {
         .parent()
         .ok_or_else(|| format!("Invalid target path: {}", task.target))?;
 
+    // Keep source paths and target paths as positional shell arguments rather
+    // than interpolating them into the command string.
     let script = match task.kind {
         SourceKind::Directory => "install -d -m 0755 \"$2\" && cp -aT \"$1\" \"$3\"",
         SourceKind::File => "install -d -m 0755 \"$2\" && cp -a \"$1\" \"$3\"",
     };
 
+    // pkexec performs the privileged filesystem write through the desktop's
+    // PolicyKit prompt; the application itself never runs as root.
     let output = Command::new("pkexec")
         .arg("sh")
         .arg("-c")
@@ -150,6 +163,8 @@ fn main() {
 }
 
 fn qml_path() -> PathBuf {
+    // Releases keep QML beside the executable, while Cargo runs use the source
+    // tree fallback below.
     let bundled_path = env::current_exe()
         .ok()
         .and_then(|path| path.parent().map(|parent| parent.join("qml/Main.qml")));

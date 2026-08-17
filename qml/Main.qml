@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Oliver Lin
+// SPDX-License-Identifier: MIT
+
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
